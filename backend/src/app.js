@@ -6,6 +6,7 @@ const authRouter = require("./routers/auth.router");
 const companyRouter = require("./routers/company.router");
 const policyRouter = require("./routers/policy.router");
 const customerRouter = require("./routers/customer.router");
+const paymentEventRouter = require("./routers/paymentEvent.router");
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/companies", companyRouter);
 app.use("/api/policies", policyRouter);
 app.use("/api/customers", customerRouter);
+app.use("/api/payment-events", paymentEventRouter);
 
 module.exports = app;

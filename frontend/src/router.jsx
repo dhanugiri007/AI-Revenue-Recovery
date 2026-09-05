@@ -6,6 +6,7 @@ import CompanySetup from "./features/company/pages/CompanySetup";
 import PolicyList from "./features/policy/pages/PolicyList";
 import CustomerList from "./features/customer/pages/CustomerList";
 import CustomerForm from "./features/customer/pages/CustomerForm";
+import EventList from "./features/paymentEvent/pages/EventList";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -56,6 +57,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CustomerForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/events",
+    element: (
+      <ProtectedRoute>
+        <EventList />
       </ProtectedRoute>
     ),
   },
