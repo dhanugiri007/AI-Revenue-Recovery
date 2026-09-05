@@ -2,6 +2,9 @@ const fs = require("fs");
 const pdfParse = require("pdf-parse");
 const Policy = require("../models/policy.model");
 const Company = require("../models/company.model");
+const { embedPolicy } = require("../services/rag.service");
+const { retrievePolicyContext } = require("../services/rag.service");
+
 
 // @desc   Upload a policy document
 // @route  POST /api/policies
@@ -35,7 +38,7 @@ const uploadPolicy = async (req, res) => {
       return res.status(400).json({ message: "Could not extract text from file" });
     }
 
-    const policy = await Policy.create({
+        const policy = await Policy.create({
       company: company._id,
       originalName: req.file.originalname,
       storedFileName: req.file.filename,
@@ -43,6 +46,10 @@ const uploadPolicy = async (req, res) => {
       extractedText,
       uploadedBy: req.user._id,
     });
+
+    // chunk + embed into ChromaDB before responding
+    await embedPolicy(policy, company._id);
+
 
     res.status(201).json({
       _id: policy._id,
@@ -108,4 +115,26 @@ const deletePolicy = async (req, res) => {
   }
 };
 
-module.exports = { uploadPolicy, getPolicies, deletePolicy };
+
+// @desc   TEST ONLY - retrieve relevant policy chunks for a query
+// @route  POST /api/policies/test-retrieve
+const testRetrieve = async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query) {
+      return res.status(400).json({ message: "Query is required" });
+    }
+
+    const company = await Company.findOne({ owner: req.user._id });
+    if (!company) {
+      return res.status(400).json({ message: "Create a company profile first" });
+    }
+
+    const results = await retrievePolicyContext(company._id, query);
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { uploadPolicy, getPolicies, deletePolicy, testRetrieve };
