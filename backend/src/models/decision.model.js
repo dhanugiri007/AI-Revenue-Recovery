@@ -55,8 +55,6 @@ const decisionSchema = new mongoose.Schema(
       type: String,
       default: "gemini-2.5-flash",
     },
-
-    // ---- Guardrails (new) ----
     guardrailStatus: {
       type: String,
       enum: ["approved", "blocked_needs_review"],
@@ -69,6 +67,23 @@ const decisionSchema = new mongoose.Schema(
     ],
     guardrailNotes: {
       type: String, 
+    },
+      reviewStatus: {
+      type: String,
+      enum: ["not_required", "pending_review", "approved_by_human", "rejected_by_human"],
+      default: function () {
+        return this.guardrailStatus === "blocked_needs_review" ? "pending_review" : "not_required";
+      },
+    },
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    reviewNotes: {
+      type: String, // human's note on why they approved/rejected
+    },
+    reviewedAt: {
+      type: Date,
     },
   },
   { timestamps: true }

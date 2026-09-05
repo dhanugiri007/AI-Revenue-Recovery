@@ -8,6 +8,7 @@ const policyRouter = require("./routers/policy.router");
 const customerRouter = require("./routers/customer.router");
 const paymentEventRouter = require("./routers/paymentEvent.router");
 const decisionRouter = require("./routers/decision.router");
+const reviewRouter = require("./routers/review.router");
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/policies", policyRouter);
 app.use("/api/customers", customerRouter);
 app.use("/api/payment-events", paymentEventRouter);
 app.use("/api/decisions", decisionRouter);
+app.use("/api/reviews", reviewRouter);
 
 module.exports = app;
