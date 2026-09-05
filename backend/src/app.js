@@ -1,7 +1,8 @@
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
+const authRouter = require("./routers/auth.router");
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is running" });
 });
 
+app.use("/api/auth", authRouter);
 
 module.exports = app;
