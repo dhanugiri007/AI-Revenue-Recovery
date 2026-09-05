@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { usePaymentEvent } from "../hooks/usePaymentEvent";
 import { useCustomer } from "../../customer/hooks/useCustomer";
 import { useCompany } from "../../company/hooks/useCompany";
-import  {usePaymentEvent} from '../hooks/usePaymentEvent';
+import { useDecision } from "../../decision/hooks/useDecision";
+import DecisionCard from "../../decision/components/DecisionCard";
 
 const failureReasons = [
   "insufficient_funds",
@@ -23,6 +25,7 @@ const EventList = () => {
   const { company } = useCompany();
   const { customers } = useCustomer();
   const { events, loading, simulateEvent } = usePaymentEvent();
+  const { generateDecision, getDecisionForEvent } = useDecision();
 
   const [formData, setFormData] = useState({
     customerId: "",
@@ -32,6 +35,9 @@ const EventList = () => {
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const [generatingId, setGeneratingId] = useState(null);
+  const [decisionError, setDecisionError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,6 +54,18 @@ const EventList = () => {
       setError(err.response?.data?.message || "Failed to simulate event");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleGenerateDecision = async (eventId) => {
+    setDecisionError("");
+    setGeneratingId(eventId);
+    try {
+      await generateDecision(eventId);
+    } catch (err) {
+      setDecisionError(err.response?.data?.message || "Failed to generate decision");
+    } finally {
+      setGeneratingId(null);
     }
   };
 
@@ -131,39 +149,66 @@ const EventList = () => {
       <div className="bg-white p-8 rounded-xl shadow-md">
         <h2 className="text-2xl font-bold mb-6">Payment Events</h2>
 
+        {decisionError && (
+          <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
+            {decisionError}
+          </p>
+        )}
+
         {loading ? (
           <p className="text-gray-500">Loading events...</p>
         ) : events.length === 0 ? (
           <p className="text-gray-500">No payment events yet.</p>
         ) : (
           <ul className="space-y-3">
-            {events.map((event) => (
-              <li key={event._id} className="border rounded-lg px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">
-                      {event.customer?.name || "Unknown customer"}{" "}
-                      <span className="text-gray-400 text-sm">({event.customer?.email})</span>
-                    </p>
-                    <p className="text-sm text-gray-500 capitalize">
-                      {event.eventType.replace(/_/g, " ")}
-                      {event.failureReason && ` — ${event.failureReason.replace(/_/g, " ")}`}
-                    </p>
+            {events.map((event) => {
+              const decision = getDecisionForEvent(event._id);
+
+              return (
+                <li key={event._id} className="border rounded-lg px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">
+                        {event.customer?.name || "Unknown customer"}{" "}
+                        <span className="text-gray-400 text-sm">
+                          ({event.customer?.email})
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-500 capitalize">
+                        {event.eventType.replace(/_/g, " ")}
+                        {event.failureReason &&
+                          ` — ${event.failureReason.replace(/_/g, " ")}`}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">₹{event.amount}</p>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[event.status]}`}
+                      >
+                        {event.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">₹{event.amount}</p>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[event.status]}`}
+                  <p className="text-xs text-gray-400 mt-2">
+                    {new Date(event.createdAt).toLocaleString()}
+                  </p>
+
+                  {decision ? (
+                    <DecisionCard decision={decision} />
+                  ) : (
+                    <button
+                      onClick={() => handleGenerateDecision(event._id)}
+                      disabled={generatingId === event._id}
+                      className="mt-3 text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
                     >
-                      {event.status}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  {new Date(event.createdAt).toLocaleString()}
-                </p>
-              </li>
-            ))}
+                      {generatingId === event._id
+                        ? "Generating decision..."
+                        : "Generate AI Decision"}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

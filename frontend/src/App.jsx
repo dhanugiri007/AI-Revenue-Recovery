@@ -5,20 +5,22 @@ import { CompanyProvider } from "./features/company/company.context";
 import { PolicyProvider } from "./features/policy/policy.context";
 import { CustomerProvider } from "./features/customer/customer.context";
 import { PaymentEventProvider } from "./features/paymentEvent/paymentEvent.context";
-
+import { DecisionProvider } from "./features/decision/decision.context";
 function App() {
   return (
-    <AuthProvider>
-      <CompanyProvider>
-        <PolicyProvider>
-          <CustomerProvider>
-            <PaymentEventProvider>
-              <RouterProvider router={router} />
-            </PaymentEventProvider>
-          </CustomerProvider>
-        </PolicyProvider>
-      </CompanyProvider>
-    </AuthProvider>
+<AuthProvider>
+  <CompanyProvider>
+    <PolicyProvider>
+      <CustomerProvider>
+        <PaymentEventProvider>
+          <DecisionProvider>
+            <RouterProvider router={router} />
+          </DecisionProvider>
+        </PaymentEventProvider>
+      </CustomerProvider>
+    </PolicyProvider>
+  </CompanyProvider>
+</AuthProvider>
   );
 }
 
