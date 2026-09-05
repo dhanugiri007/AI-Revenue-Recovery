@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { runExecutionApi, getExecutionsApi } from "./services/execution.api";
 import { useCompany } from "../company/hooks/useCompany";
+import { socket } from "../../services/socket";
 
 export const ExecutionContext = createContext();
 
@@ -27,6 +28,22 @@ export const ExecutionProvider = ({ children }) => {
       setLoading(false);
     }
   }, [company]);
+
+    useEffect(() => {
+    const handleExecutionUpdated = (execution) => {
+      setExecutions((prev) => {
+        const exists = prev.some((e) => e._id === execution._id);
+        if (exists) return prev.map((e) => (e._id === execution._id ? execution : e));
+        return [execution, ...prev];
+      });
+    };
+
+    socket.on("execution:updated", handleExecutionUpdated);
+
+    return () => {
+      socket.off("execution:updated", handleExecutionUpdated);
+    };
+  }, []);
 
   const runExecution = async (decisionId) => {
     const data = await runExecutionApi(decisionId);

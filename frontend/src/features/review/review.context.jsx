@@ -5,6 +5,7 @@ import {
   rejectDecisionApi,
 } from "./services/review.api";
 import { useCompany } from "../company/hooks/useCompany";
+import { socket } from "../../services/socket";
 
 export const ReviewContext = createContext();
 
@@ -31,6 +32,19 @@ export const ReviewProvider = ({ children }) => {
       setLoading(false);
     }
   }, [company]);
+
+    useEffect(() => {
+    const handleDecisionReviewed = (decision) => {
+      // A decision was just reviewed elsewhere - remove it from the pending queue if present
+      setPendingReviews((prev) => prev.filter((d) => d._id !== decision._id));
+    };
+
+    socket.on("decision:reviewed", handleDecisionReviewed);
+
+    return () => {
+      socket.off("decision:reviewed", handleDecisionReviewed);
+    };
+  }, []);
 
   const approveDecision = async (id, notes) => {
     const data = await approveDecisionApi(id, notes);

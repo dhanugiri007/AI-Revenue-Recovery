@@ -4,6 +4,7 @@ const PaymentEvent = require("../models/paymentEvent.model");
 const Customer = require("../models/customer.model");
 const Company = require("../models/company.model");
 const { executeAction } = require("../services/executor.service");
+const { emitToCompany } = require("../config/socket");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -75,10 +76,17 @@ const runExecution = async (req, res) => {
       execution.executedAt = new Date();
       await execution.save();
 
+       emitToCompany(company._id.toString(), "execution:updated", execution);
       res.status(200).json({ message: "Execution failed", execution });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    execution.status = "failed";
+    execution.errorMessage = execError.message;
+    execution.executedAt = new Date();
+   await execution.save();
+
+   emitToCompany(company._id.toString(), "execution:updated", execution);
+     res.status(200).json({ message: "Execution failed", execution });
   }
 };
 

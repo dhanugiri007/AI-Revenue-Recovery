@@ -4,6 +4,7 @@ const Customer = require("../models/customer.model");
 const Company = require("../models/company.model");
 const { generateDecision } = require("../services/decisionEngine.service");
 const { runGuardrails } = require("../services/guardrails.service");
+const { emitToCompany } = require("../config/socket");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -57,7 +58,7 @@ const generateDecisionForEvent = async (req, res) => {
       Decision
     );
     
-        const decision = await Decision.create({
+      const decision = await Decision.create({
       company: company._id,
       paymentEvent: event._id,
       customer: customer._id,
@@ -73,6 +74,8 @@ const generateDecisionForEvent = async (req, res) => {
 
     event.status = "processed";
     await event.save();
+
+     emitToCompany(company._id.toString(), "decision:generated", decision);
 
     res.status(201).json({ message: "Decision generated", decision });
   } catch (error) {

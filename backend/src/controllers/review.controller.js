@@ -1,5 +1,6 @@
 const Decision = require("../models/decision.model");
 const Company = require("../models/company.model");
+const { emitToCompany } = require("../config/socket");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -56,6 +57,8 @@ const approveDecision = async (req, res) => {
     await decision.save();
 
     res.status(200).json({ message: "Decision approved", decision });
+    emitToCompany(company._id.toString(), "decision:reviewed", decision);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -90,6 +93,7 @@ const rejectDecision = async (req, res) => {
     await decision.save();
 
     res.status(200).json({ message: "Decision rejected", decision });
+  emitToCompany(company._id.toString(), "decision:reviewed", decision);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

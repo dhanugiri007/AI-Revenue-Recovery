@@ -5,6 +5,7 @@ import {
   updateMyCompanyApi,
 } from "./services/company.api";
 import { useAuth } from "../auth/hooks/useAuth";
+import { socket } from "../../services/socket";
 
 export const CompanyContext = createContext();
 
@@ -30,6 +31,14 @@ export const CompanyProvider = ({ children }) => {
     };
     fetchCompany();
   }, [user]);
+
+   useEffect(() => {
+  if (company) {
+    console.log("Attempting socket join for company:", company._id);
+    if (!socket.connected) socket.connect();
+    socket.emit("join_company", company._id);
+  }
+}, [company]);
 
   const createCompany = async (formData) => {
     const data = await createCompanyApi(formData);

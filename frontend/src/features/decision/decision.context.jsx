@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 import { generateDecisionApi, getDecisionsApi } from "./services/decision.api";
 import { useCompany } from "../company/hooks/useCompany";
+import { socket } from "../../services/socket";
 
 export const DecisionContext = createContext();
 
@@ -27,6 +28,30 @@ export const DecisionProvider = ({ children }) => {
       setLoading(false);
     }
   }, [company]);
+
+    useEffect(() => {
+    const handleDecisionGenerated = (decision) => {
+      setDecisions((prev) => {
+        const exists = prev.some((d) => d._id === decision._id);
+        if (exists) return prev.map((d) => (d._id === decision._id ? decision : d));
+        return [decision, ...prev];
+      });
+    };
+
+    const handleDecisionReviewed = (decision) => {
+      setDecisions((prev) => prev.map((d) => (d._id === decision._id ? decision : d)));
+    };
+
+    socket.on("decision:generated", handleDecisionGenerated);
+    socket.on("decision:reviewed", handleDecisionReviewed);
+
+    return () => {
+      socket.off("decision:generated", handleDecisionGenerated);
+      socket.off("decision:reviewed", handleDecisionReviewed);
+    };
+  }, []);
+
+  
 
   // Returns the decision (existing or newly generated) and upserts it into local state
   const generateDecision = async (eventId) => {
