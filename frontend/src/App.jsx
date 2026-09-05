@@ -6,6 +6,8 @@ import { PolicyProvider } from "./features/policy/policy.context";
 import { CustomerProvider } from "./features/customer/customer.context";
 import { PaymentEventProvider } from "./features/paymentEvent/paymentEvent.context";
 import { DecisionProvider } from "./features/decision/decision.context";
+import { ReviewProvider } from "./features/review/review.context";
+
 function App() {
   return (
 <AuthProvider>
@@ -14,7 +16,9 @@ function App() {
       <CustomerProvider>
         <PaymentEventProvider>
           <DecisionProvider>
-            <RouterProvider router={router} />
+            <ReviewProvider>
+              <RouterProvider router={router} />
+            </ReviewProvider>
           </DecisionProvider>
         </PaymentEventProvider>
       </CustomerProvider>

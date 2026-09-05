@@ -7,6 +7,7 @@ import PolicyList from "./features/policy/pages/PolicyList";
 import CustomerList from "./features/customer/pages/CustomerList";
 import CustomerForm from "./features/customer/pages/CustomerForm";
 import EventList from "./features/paymentEvent/pages/EventList";
+import ReviewQueue from "./features/review/pages/ReviewQueue";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -68,4 +69,13 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+   {
+    path: "/reviews",
+    element: (
+      <ProtectedRoute>
+        <ReviewQueue />
+      </ProtectedRoute>
+    ),
+  },
+
 ]);

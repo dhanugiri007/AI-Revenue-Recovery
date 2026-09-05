@@ -6,10 +6,13 @@ const FORBIDDEN_ACTIONS_BY_FAILURE_REASON = {
 
 const MIN_CONFIDENCE_THRESHOLD = 0.6;
 
+const normalizeWhitespace = (text) => text.replace(/\s+/g, " ").trim();
 
 const checkCitationGrounded = (decisionData, retrievedChunks) => {
-  const citation = decisionData.citedPolicyText.trim();
-  const isGrounded = retrievedChunks.some((chunk) => chunk.content.includes(citation));
+  const citation = normalizeWhitespace(decisionData.citedPolicyText);
+  const isGrounded = retrievedChunks.some((chunk) =>
+    normalizeWhitespace(chunk.content).includes(citation)
+  );
   return isGrounded ? null : "citation_not_found_in_retrieved_policy";
 };
 

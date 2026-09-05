@@ -57,7 +57,7 @@ const generateDecisionForEvent = async (req, res) => {
       Decision
     );
     
-    const decision = await Decision.create({
+        const decision = await Decision.create({
       company: company._id,
       paymentEvent: event._id,
       customer: customer._id,
@@ -66,6 +66,9 @@ const generateDecisionForEvent = async (req, res) => {
       reasoning: decisionData.reasoning,
       citedPolicyText: decisionData.citedPolicyText,
       retrievedChunks: policyChunks,
+      guardrailStatus,
+      guardrailFlags,
+      guardrailNotes,
     });
 
     event.status = "processed";
