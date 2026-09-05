@@ -3,6 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const authRouter = require("./routers/auth.router");
+const companyRouter = require("./routers/company.router");
+const policyRouter = require("./routers/policy.router");
 
 const app = express();
 
@@ -20,5 +22,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/companies", companyRouter);
+app.use("/api/policies", policyRouter);
 
 module.exports = app;
