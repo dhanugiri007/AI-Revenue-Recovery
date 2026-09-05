@@ -11,7 +11,7 @@ const decisionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "PaymentEvent",
       required: true,
-      unique: true, // one decision per event - re-generating returns the existing one instead
+      unique: true,
     },
     customer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,17 +31,17 @@ const decisionSchema = new mongoose.Schema(
       required: true,
     },
     confidence: {
-      type: Number, // 0 to 1
+      type: Number,
       required: true,
       min: 0,
       max: 1,
     },
     reasoning: {
-      type: String, // Gemini's explanation, in its own words
+      type: String,
       required: true,
     },
     citedPolicyText: {
-      type: String, // the exact policy excerpt Gemini used to justify the action
+      type: String,
       required: true,
     },
     retrievedChunks: [
@@ -53,7 +53,22 @@ const decisionSchema = new mongoose.Schema(
     ],
     modelUsed: {
       type: String,
-      default: "gemini-3.7-flash",
+      default: "gemini-2.5-flash",
+    },
+
+    // ---- Guardrails (new) ----
+    guardrailStatus: {
+      type: String,
+      enum: ["approved", "blocked_needs_review"],
+      required: true,
+    },
+    guardrailFlags: [
+      {
+        type: String,
+      },
+    ],
+    guardrailNotes: {
+      type: String, 
     },
   },
   { timestamps: true }

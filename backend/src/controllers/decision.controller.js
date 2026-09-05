@@ -3,6 +3,7 @@ const PaymentEvent = require("../models/paymentEvent.model");
 const Customer = require("../models/customer.model");
 const Company = require("../models/company.model");
 const { generateDecision } = require("../services/decisionEngine.service");
+const { runGuardrails } = require("../services/guardrails.service");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -49,7 +50,13 @@ const generateDecisionForEvent = async (req, res) => {
       await event.save();
       return res.status(500).json({ message: genError.message });
     }
-
+    const { guardrailStatus, guardrailFlags, guardrailNotes } = await runGuardrails(
+      decisionData,
+      event,
+      policyChunks,
+      Decision
+    );
+    
     const decision = await Decision.create({
       company: company._id,
       paymentEvent: event._id,
