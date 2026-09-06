@@ -1,6 +1,7 @@
 const Decision = require("../models/decision.model");
 const Company = require("../models/company.model");
 const { emitToCompany } = require("../config/socket");
+const { logAuditEvent } = require("../services/auditLog.service");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -56,6 +57,15 @@ const approveDecision = async (req, res) => {
     decision.reviewedAt = new Date();
     await decision.save();
 
+      await logAuditEvent({
+      company: company._id,
+      paymentEvent: decision.paymentEvent,
+      eventCategory: "human_reviewed",
+      summary: `Decision approved by human. ${notes ? `Note: ${notes}` : ""}`,
+      metadata: { reviewStatus: "approved_by_human", notes },
+      actor: req.user._id.toString(),
+    });
+
     res.status(200).json({ message: "Decision approved", decision });
     emitToCompany(company._id.toString(), "decision:reviewed", decision);
 
@@ -91,6 +101,15 @@ const rejectDecision = async (req, res) => {
     decision.reviewNotes = notes;
     decision.reviewedAt = new Date();
     await decision.save();
+
+      await logAuditEvent({
+      company: company._id,
+      paymentEvent: decision.paymentEvent,
+      eventCategory: "human_reviewed",
+      summary: `Decision rejected by human. Note: ${notes}`,
+      metadata: { reviewStatus: "rejected_by_human", notes },
+      actor: req.user._id.toString(),
+    });
 
     res.status(200).json({ message: "Decision rejected", decision });
   emitToCompany(company._id.toString(), "decision:reviewed", decision);

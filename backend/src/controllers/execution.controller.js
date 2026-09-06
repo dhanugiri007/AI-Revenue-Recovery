@@ -5,6 +5,8 @@ const Customer = require("../models/customer.model");
 const Company = require("../models/company.model");
 const { executeAction } = require("../services/executor.service");
 const { emitToCompany } = require("../config/socket");
+const { logAuditEvent } = require("../services/auditLog.service");
+
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -69,6 +71,17 @@ const runExecution = async (req, res) => {
       execution.executedAt = new Date();
       await execution.save();
 
+      emitToCompany(company._id.toString(), "execution:updated", execution);
+
+      await logAuditEvent({
+        company: company._id,
+        paymentEvent: event._id,
+        eventCategory: "action_executed",
+        summary: `Action "${decision.recommendedAction}" executed successfully. ${result}`,
+        metadata: { status: "completed", result },
+        actor: req.user._id.toString(),
+      });
+
       res.status(200).json({ message: "Execution completed", execution });
     } catch (execError) {
       execution.status = "failed";
@@ -76,19 +89,24 @@ const runExecution = async (req, res) => {
       execution.executedAt = new Date();
       await execution.save();
 
-       emitToCompany(company._id.toString(), "execution:updated", execution);
+      emitToCompany(company._id.toString(), "execution:updated", execution);
+
+      await logAuditEvent({
+        company: company._id,
+        paymentEvent: event._id,
+        eventCategory: "action_executed",
+        summary: `Action "${decision.recommendedAction}" execution failed: ${execError.message}`,
+        metadata: { status: "failed", errorMessage: execError.message },
+        actor: req.user._id.toString(),
+      });
+
       res.status(200).json({ message: "Execution failed", execution });
     }
   } catch (error) {
-    execution.status = "failed";
-    execution.errorMessage = execError.message;
-    execution.executedAt = new Date();
-   await execution.save();
-
-   emitToCompany(company._id.toString(), "execution:updated", execution);
-     res.status(200).json({ message: "Execution failed", execution });
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 // @desc   Get all executions for logged-in user's company
 // @route  GET /api/executions

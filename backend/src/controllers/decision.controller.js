@@ -5,6 +5,7 @@ const Company = require("../models/company.model");
 const { generateDecision } = require("../services/decisionEngine.service");
 const { runGuardrails } = require("../services/guardrails.service");
 const { emitToCompany } = require("../config/socket");
+const { logAuditEvent } = require("../services/auditLog.service");
 
 const getCompanyOrFail = async (userId, res) => {
   const company = await Company.findOne({ owner: userId });
@@ -51,6 +52,14 @@ const generateDecisionForEvent = async (req, res) => {
       await event.save();
       return res.status(500).json({ message: genError.message });
     }
+    await logAuditEvent({
+      company: company._id,
+      paymentEvent: event._id,
+      eventCategory: "policy_retrieved",
+      summary: `Retrieved ${policyChunks.length} policy chunk(s) for decision-making.`,
+      metadata: { retrievedChunks: policyChunks },
+      actor: "system",
+    });
     const { guardrailStatus, guardrailFlags, guardrailNotes } = await runGuardrails(
       decisionData,
       event,
@@ -76,7 +85,31 @@ const generateDecisionForEvent = async (req, res) => {
     await event.save();
 
      emitToCompany(company._id.toString(), "decision:generated", decision);
+         await logAuditEvent({
+      company: company._id,
+      paymentEvent: event._id,
+      eventCategory: "ai_decision_made",
+      summary: `AI recommended "${decision.recommendedAction}" with ${Math.round(decision.confidence * 100)}% confidence.`,
+      metadata: {
+        recommendedAction: decision.recommendedAction,
+        confidence: decision.confidence,
+        reasoning: decision.reasoning,
+        citedPolicyText: decision.citedPolicyText,
+      },
+      actor: "system",
+    });
 
+    if (guardrailStatus === "blocked_needs_review") {
+      await logAuditEvent({
+        company: company._id,
+        paymentEvent: event._id,
+        eventCategory: "guardrail_blocked",
+        summary: `Decision blocked by guardrails: ${guardrailNotes}`,
+        metadata: { guardrailFlags },
+        actor: "system",
+      });
+    }
+    
     res.status(201).json({ message: "Decision generated", decision });
   } catch (error) {
     res.status(500).json({ message: error.message });

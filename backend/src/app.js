@@ -10,6 +10,7 @@ const paymentEventRouter = require("./routers/paymentEvent.router");
 const decisionRouter = require("./routers/decision.router");
 const reviewRouter = require("./routers/review.router");
 const executionRouter = require("./routers/execution.router");
+const auditLogRouter = require("./routers/auditLog.router");
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use("/api/payment-events", paymentEventRouter);
 app.use("/api/decisions", decisionRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/executions", executionRouter);
+app.use("/api/audit-logs", auditLogRouter);
 
 module.exports = app;
