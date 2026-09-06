@@ -10,20 +10,11 @@ const actionLabels = {
   escalate_to_human: "Escalate to Human",
 };
 
-const actionColors = {
-  retry_payment: "bg-blue-100 text-blue-700",
-  retry_payment_after_delay: "bg-blue-100 text-blue-700",
-  send_email_update_payment_method: "bg-purple-100 text-purple-700",
-  send_outreach_email_with_discount: "bg-green-100 text-green-700",
-  send_outreach_email_no_discount: "bg-green-100 text-green-700",
-  escalate_to_human: "bg-red-100 text-red-700",
-};
-
 const executionStatusColors = {
-  pending: "bg-gray-100 text-gray-700",
-  executing: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
-  failed: "bg-red-100 text-red-700",
+  pending: "bg-white/5 text-zinc-400 border-white/10",
+  executing: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  completed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  failed: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
 const isSafeToExecute = (decision) => {
@@ -51,41 +42,39 @@ const DecisionCard = ({ decision }) => {
   };
 
   return (
-    <div className="mt-3 border-t pt-3 space-y-2 bg-gray-50 rounded-lg p-4">
+    <div className="mt-3 border-t border-white/10 pt-3 space-y-3">
       <div className="flex items-center justify-between">
-        <span
-          className={`text-xs px-2 py-1 rounded-full font-medium ${actionColors[decision.recommendedAction]}`}
-        >
+        <span className="text-[10px] px-2.5 py-1 rounded-full border border-white/10 bg-white/[0.03] text-zinc-300 uppercase tracking-wider">
           {actionLabels[decision.recommendedAction]}
         </span>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-zinc-600">
           Confidence: {Math.round(decision.confidence * 100)}%
         </span>
       </div>
 
-      <p className="text-sm text-gray-700">{decision.reasoning}</p>
+      <p className="text-sm text-zinc-400 leading-relaxed">{decision.reasoning}</p>
 
-      <div className="bg-white border rounded p-2">
-        <p className="text-xs text-gray-400 mb-1">Cited policy text:</p>
-        <p className="text-xs text-gray-600 italic">"{decision.citedPolicyText}"</p>
+      <div className="rounded-lg border border-white/10 bg-black/30 p-3">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600 mb-1">Cited policy text</p>
+        <p className="text-xs text-zinc-500 italic">"{decision.citedPolicyText}"</p>
       </div>
 
       {!canExecute && !execution && (
-        <p className="text-xs text-orange-600 bg-orange-50 rounded p-2">
+        <p className="text-xs text-orange-400 bg-orange-500/10 border border-orange-500/20 rounded-lg p-2">
           This decision is pending human review and cannot be executed yet.
         </p>
       )}
 
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
 
       {execution ? (
-        <div className="flex items-center justify-between bg-white border rounded p-2">
+        <div className="flex items-center justify-between rounded-lg border border-white/10 bg-black/30 p-3">
           <span
-            className={`text-xs px-2 py-1 rounded-full font-medium ${executionStatusColors[execution.status]}`}
+            className={`text-[10px] px-2 py-1 rounded-full border font-medium ${executionStatusColors[execution.status]}`}
           >
             {execution.status}
           </span>
-          <p className="text-xs text-gray-500 text-right">
+          <p className="text-xs text-zinc-500 text-right">
             {execution.result || execution.errorMessage}
           </p>
         </div>
@@ -94,7 +83,7 @@ const DecisionCard = ({ decision }) => {
           <button
             onClick={handleExecute}
             disabled={running}
-            className="text-sm bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+            className="rounded-full bg-white text-black px-4 py-2 text-xs font-medium hover:bg-zinc-200 transition disabled:opacity-50"
           >
             {running ? "Executing..." : "Execute Action"}
           </button>
@@ -105,3 +94,4 @@ const DecisionCard = ({ decision }) => {
 };
 
 export default DecisionCard;
+

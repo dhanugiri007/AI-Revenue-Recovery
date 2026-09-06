@@ -13,7 +13,7 @@ const emptyForm = {
 };
 
 const CustomerForm = () => {
-  const { id } = useParams(); // present only in edit mode
+  const { id } = useParams();
   const isEdit = Boolean(id);
   const { createCustomer, updateCustomer } = useCustomer();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const CustomerForm = () => {
             name: data.name,
             email: data.email,
             customerType: data.customerType,
-            activeSince: data.activeSince?.slice(0, 10), // format for <input type="date">
+            activeSince: data.activeSince?.slice(0, 10),
             outstandingBalance: data.outstandingBalance,
             hasActiveSupportTicket: data.hasActiveSupportTicket,
           });
@@ -48,10 +48,7 @@ const CustomerForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -73,94 +70,98 @@ const CustomerForm = () => {
   };
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+    return <p className="text-zinc-500 mt-10">Loading...</p>;
   }
 
+  const inputClass =
+    "w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/30";
+
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6">
-        {isEdit ? "Edit Customer" : "Add Customer"}
-      </h2>
+    <div className="max-w-md space-y-6">
+      <div>
+        <p className="text-xs uppercase tracking-wider text-zinc-600">Customers</p>
+        <h1 className="text-2xl font-semibold text-white mt-1">
+          {isEdit ? "Edit Customer" : "Add Customer"}
+        </h1>
+      </div>
 
-      {error && (
-        <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
-          {error}
-        </p>
-      )}
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        {error && (
+          <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-2 rounded-lg mb-4">
+            {error}
+          </p>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Customer Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-
-        <select
-          name="customerType"
-          value={formData.customerType}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="individual">Individual</option>
-          <option value="business">Business</option>
-        </select>
-
-        <div>
-          <label className="text-sm text-gray-600 block mb-1">Active Since</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="date"
-            name="activeSince"
-            value={formData.activeSince}
+            type="text"
+            name="name"
+            placeholder="Customer Name"
+            value={formData.name}
             onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             required
           />
-        </div>
 
-        <div>
-          <label className="text-sm text-gray-600 block mb-1">Outstanding Balance (INR)</label>
           <input
-            type="number"
-            name="outstandingBalance"
-            value={formData.outstandingBalance}
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
-            min="0"
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
+            required
           />
-        </div>
 
-        <label className="flex items-center gap-2 text-sm text-gray-600">
-          <input
-            type="checkbox"
-            name="hasActiveSupportTicket"
-            checked={formData.hasActiveSupportTicket}
-            onChange={handleChange}
-          />
-          Has an active support ticket
-        </label>
+          <select name="customerType" value={formData.customerType} onChange={handleChange} className={inputClass}>
+            <option value="individual" className="bg-zinc-900">Individual</option>
+            <option value="business" className="bg-zinc-900">Business</option>
+          </select>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? "Saving..." : isEdit ? "Update Customer" : "Add Customer"}
-        </button>
-      </form>
+          <div>
+            <label className="text-xs text-zinc-500 block mb-1.5">Active Since</label>
+            <input
+              type="date"
+              name="activeSince"
+              value={formData.activeSince}
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-zinc-500 block mb-1.5">Outstanding Balance (INR)</label>
+            <input
+              type="number"
+              name="outstandingBalance"
+              value={formData.outstandingBalance}
+              onChange={handleChange}
+              min="0"
+              className={inputClass}
+            />
+          </div>
+
+          <label className="flex items-center gap-2 text-xs text-zinc-400">
+            <input
+              type="checkbox"
+              name="hasActiveSupportTicket"
+              checked={formData.hasActiveSupportTicket}
+              onChange={handleChange}
+              className="accent-white"
+            />
+            Has an active support ticket
+          </label>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-full bg-white text-black py-2.5 text-sm font-medium hover:bg-zinc-200 transition disabled:opacity-50"
+          >
+            {submitting ? "Saving..." : isEdit ? "Update Customer" : "Add Customer"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

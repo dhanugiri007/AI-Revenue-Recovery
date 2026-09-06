@@ -3,10 +3,10 @@ import { usePolicy } from "../hooks/usePolicy";
 import { useCompany } from "../../company/hooks/useCompany";
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-700",
-  processing: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
-  failed: "bg-red-100 text-red-700",
+  pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+  processing: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  completed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  failed: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
 const PolicyList = () => {
@@ -19,7 +19,6 @@ const PolicyList = () => {
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setError("");
     setUploading(true);
     try {
@@ -28,7 +27,7 @@ const PolicyList = () => {
       setError(err.response?.data?.message || "Upload failed");
     } finally {
       setUploading(false);
-      fileInputRef.current.value = ""; // reset so same file can be re-selected
+      fileInputRef.current.value = "";
     }
   };
 
@@ -42,25 +41,24 @@ const PolicyList = () => {
   };
 
   if (!company) {
-    return (
-      <p className="text-center mt-10 text-gray-500">
-        Set up your company first before uploading policies.
-      </p>
-    );
+    return <p className="text-zinc-500 mt-10">Set up your company first before uploading policies.</p>;
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Policy Documents</h2>
+    <div className="max-w-2xl space-y-6">
+      <div>
+        <p className="text-xs uppercase tracking-wider text-zinc-600">Policies</p>
+        <h1 className="text-2xl font-semibold text-white mt-1">Policy Documents</h1>
+      </div>
 
-      {error && (
-        <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
-          {error}
-        </p>
-      )}
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        {error && (
+          <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-2 rounded-lg mb-4">
+            {error}
+          </p>
+        )}
 
-      <div className="mb-6">
-        <label className="inline-block cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <label className="inline-flex items-center gap-2 cursor-pointer rounded-full bg-white text-black px-5 py-2.5 text-sm font-medium hover:bg-zinc-200 transition mb-6">
           {uploading ? "Uploading..." : "Upload Policy (PDF/TXT)"}
           <input
             type="file"
@@ -71,42 +69,42 @@ const PolicyList = () => {
             className="hidden"
           />
         </label>
-      </div>
 
-      {loading ? (
-        <p className="text-gray-500">Loading policies...</p>
-      ) : policies.length === 0 ? (
-        <p className="text-gray-500">No policy documents uploaded yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {policies.map((policy) => (
-            <li
-              key={policy._id}
-              className="flex items-center justify-between border rounded-lg px-4 py-3"
-            >
-              <div>
-                <p className="font-medium">{policy.originalName}</p>
-                <p className="text-xs text-gray-400 uppercase">{policy.fileType}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    statusColors[policy.embeddingStatus]
-                  }`}
-                >
-                  {policy.embeddingStatus}
-                </span>
-                <button
-                  onClick={() => handleDelete(policy._id)}
-                  className="text-red-500 text-sm hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+        {loading ? (
+          <p className="text-zinc-500 text-sm">Loading policies...</p>
+        ) : policies.length === 0 ? (
+          <p className="text-zinc-600 text-sm">No policy documents uploaded yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {policies.map((policy) => (
+              <li
+                key={policy._id}
+                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-white">{policy.originalName}</p>
+                  <p className="text-[11px] text-zinc-600 uppercase tracking-wider mt-0.5">
+                    {policy.fileType}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`text-[10px] px-2 py-1 rounded-full border font-medium ${statusColors[policy.embeddingStatus]}`}
+                  >
+                    {policy.embeddingStatus}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(policy._id)}
+                    className="text-xs text-zinc-500 hover:text-red-400 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };

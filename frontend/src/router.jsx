@@ -2,81 +2,37 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
+import AppLayout from "./components/AppLayout";
+import Dashboard from "./features/analytics/pages/Dashboard";
 import CompanySetup from "./features/company/pages/CompanySetup";
 import PolicyList from "./features/policy/pages/PolicyList";
 import CustomerList from "./features/customer/pages/CustomerList";
 import CustomerForm from "./features/customer/pages/CustomerForm";
 import EventList from "./features/paymentEvent/pages/EventList";
 import ReviewQueue from "./features/review/pages/ReviewQueue";
-import Dashboard from "./features/analytics/pages/Dashboard";
-
+import LandingPage from './LandingPage';
+import HowItWorks from "./How";
 export const router = createBrowserRouter([
-  { path: "/", element: <Login /> },
+  
+  { path: "/", element: <LandingPage/> },
+  {path: "/how-it-works", element: <HowItWorks/>},
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
   {
-    path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <AppLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/company", element: <CompanySetup /> },
+      { path: "/policies", element: <PolicyList /> },
+      { path: "/customers", element: <CustomerList /> },
+      { path: "/customers/new", element: <CustomerForm /> },
+      { path: "/customers/:id/edit", element: <CustomerForm /> },
+      { path: "/events", element: <EventList /> },
+      { path: "/reviews", element: <ReviewQueue /> },
+    ],
   },
-  {
-    path: "/company",
-    element: (
-      <ProtectedRoute>
-        <CompanySetup />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/policies",
-    element: (
-      <ProtectedRoute>
-        <PolicyList />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/customers",
-    element: (
-      <ProtectedRoute>
-        <CustomerList />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/customers/new",
-    element: (
-      <ProtectedRoute>
-        <CustomerForm />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/customers/:id/edit",
-    element: (
-      <ProtectedRoute>
-        <CustomerForm />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/events",
-    element: (
-      <ProtectedRoute>
-        <EventList />
-      </ProtectedRoute>
-    ),
-  },
-   {
-    path: "/reviews",
-    element: (
-      <ProtectedRoute>
-        <ReviewQueue />
-      </ProtectedRoute>
-    ),
-  },
-
 ]);

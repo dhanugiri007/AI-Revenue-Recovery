@@ -16,11 +16,14 @@ const failureReasons = [
 ];
 
 const statusColors = {
-  received: "bg-gray-100 text-gray-700",
-  processing: "bg-blue-100 text-blue-700",
-  processed: "bg-green-100 text-green-700",
-  failed: "bg-red-100 text-red-700",
+  received: "bg-white/5 text-zinc-400 border-white/10",
+  processing: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  processed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  failed: "bg-red-500/10 text-red-400 border-red-500/20",
 };
+
+const inputClass =
+  "w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/30";
 
 const EventList = () => {
   const { company } = useCompany();
@@ -71,49 +74,39 @@ const EventList = () => {
   };
 
   if (!company) {
-    return (
-      <p className="text-center mt-10 text-gray-500">
-        Set up your company first before simulating payment events.
-      </p>
-    );
+    return <p className="text-zinc-500 mt-10">Set up your company first before simulating payment events.</p>;
   }
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 space-y-8">
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs uppercase tracking-wider text-zinc-600">Recovery Cases</p>
+        <h1 className="text-2xl font-semibold text-white mt-1">Payment Events</h1>
+      </div>
+
       {/* Simulate form */}
-      <div className="bg-white p-8 rounded-xl shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Simulate Payment Failure</h2>
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        <h2 className="text-sm font-medium text-white mb-4">Simulate Payment Failure</h2>
 
         {error && (
-          <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
+          <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-2 rounded-lg mb-4">
             {error}
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <select
-            name="customerId"
-            value={formData.customerId}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          >
-            <option value="">Select a customer</option>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <select name="customerId" value={formData.customerId} onChange={handleChange} className={inputClass} required>
+            <option value="" className="bg-zinc-900">Select a customer</option>
             {customers.map((c) => (
-              <option key={c._id} value={c._id}>
+              <option key={c._id} value={c._id} className="bg-zinc-900">
                 {c.name} ({c.email})
               </option>
             ))}
           </select>
 
-          <select
-            name="failureReason"
-            value={formData.failureReason}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
+          <select name="failureReason" value={formData.failureReason} onChange={handleChange} className={inputClass}>
             {failureReasons.map((reason) => (
-              <option key={reason} value={reason}>
+              <option key={reason} value={reason} className="bg-zinc-900">
                 {reason.replace(/_/g, " ")}
               </option>
             ))}
@@ -126,71 +119,66 @@ const EventList = () => {
             value={formData.amount}
             onChange={handleChange}
             min="1"
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={inputClass}
             required
           />
 
           <button
             type="submit"
             disabled={submitting || customers.length === 0}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded-full bg-white text-black py-2.5 text-sm font-medium hover:bg-zinc-200 transition disabled:opacity-50"
           >
             {submitting ? "Simulating..." : "Simulate Payment Failure"}
           </button>
 
           {customers.length === 0 && (
-            <p className="text-xs text-gray-400 text-center">
-              Add a customer first before simulating events.
-            </p>
+            <p className="text-xs text-zinc-600 text-center">Add a customer first before simulating events.</p>
           )}
         </form>
       </div>
 
       {/* Events timeline */}
-      <div className="bg-white p-8 rounded-xl shadow-md">
-        <h2 className="text-2xl font-bold mb-6">Payment Events</h2>
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        <h2 className="text-sm font-medium text-white mb-4">Events</h2>
 
         {decisionError && (
-          <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
+          <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-2 rounded-lg mb-4">
             {decisionError}
           </p>
         )}
 
         {loading ? (
-          <p className="text-gray-500">Loading events...</p>
+          <p className="text-zinc-500 text-sm">Loading events...</p>
         ) : events.length === 0 ? (
-          <p className="text-gray-500">No payment events yet.</p>
+          <p className="text-zinc-600 text-sm">No payment events yet.</p>
         ) : (
           <ul className="space-y-3">
             {events.map((event) => {
               const decision = getDecisionForEvent(event._id);
 
               return (
-                <li key={event._id} className="border rounded-lg px-4 py-3">
+                <li key={event._id} className="rounded-lg border border-white/10 bg-black/20 px-4 py-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">
+                      <p className="text-sm font-medium text-white">
                         {event.customer?.name || "Unknown customer"}{" "}
-                        <span className="text-gray-400 text-sm">
-                          ({event.customer?.email})
-                        </span>
+                        <span className="text-zinc-600 text-xs">({event.customer?.email})</span>
                       </p>
-                      <p className="text-sm text-gray-500 capitalize">
+                      <p className="text-xs text-zinc-500 capitalize mt-0.5">
                         {event.eventType.replace(/_/g, " ")}
-                        {event.failureReason &&
-                          ` — ${event.failureReason.replace(/_/g, " ")}`}
+                        {event.failureReason && ` — ${event.failureReason.replace(/_/g, " ")}`}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">₹{event.amount}</p>
+                      <p className="text-sm font-medium text-white">₹{event.amount}</p>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[event.status]}`}
+                        className={`text-[10px] px-2 py-1 rounded-full border font-medium ${statusColors[event.status]}`}
                       >
                         {event.status}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-[11px] text-zinc-700 mt-2">
                     {new Date(event.createdAt).toLocaleString()}
                   </p>
 
@@ -200,13 +188,12 @@ const EventList = () => {
                     <button
                       onClick={() => handleGenerateDecision(event._id)}
                       disabled={generatingId === event._id}
-                      className="mt-3 text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                      className="mt-3 rounded-full border border-white/15 bg-white/[0.03] text-white px-4 py-2 text-xs font-medium hover:bg-white/[0.08] transition disabled:opacity-50"
                     >
-                      {generatingId === event._id
-                        ? "Generating decision..."
-                        : "Generate AI Decision"}
+                      {generatingId === event._id ? "Generating decision..." : "Generate AI Decision"}
                     </button>
                   )}
+
                   <AuditTrail eventId={event._id} />
                 </li>
               );

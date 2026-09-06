@@ -39,54 +39,59 @@ const CompanySetup = () => {
   };
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-500">Loading...</p>;
+    return <p className="text-zinc-500 mt-10">Loading...</p>;
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-6">
-        {company ? "Company Settings" : "Set Up Your Company"}
-      </h2>
+    <div className="max-w-md space-y-6">
+      <div>
+        <p className="text-xs uppercase tracking-wider text-zinc-600">Settings</p>
+        <h1 className="text-2xl font-semibold text-white mt-1">
+          {company ? "Company Settings" : "Set Up Your Company"}
+        </h1>
+      </div>
 
-      {error && (
-        <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded mb-4">
-          {error}
-        </p>
-      )}
-      {success && (
-        <p className="text-green-600 text-sm text-center bg-green-50 p-2 rounded mb-4">
-          {success}
-        </p>
-      )}
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-6">
+        {error && (
+          <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-2 rounded-lg mb-4">
+            {error}
+          </p>
+        )}
+        {success && (
+          <p className="text-emerald-400 text-sm text-center bg-emerald-500/10 border border-emerald-500/20 p-2 rounded-lg mb-4">
+            {success}
+          </p>
+        )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Company Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="Company Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/30"
+            required
+          />
 
-        <input
-          type="text"
-          name="industry"
-          placeholder="Industry (optional)"
-          value={formData.industry}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+          <input
+            type="text"
+            name="industry"
+            placeholder="Industry (optional)"
+            value={formData.industry}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-white/30"
+          />
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          {submitting ? "Saving..." : company ? "Update Company" : "Create Company"}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-full bg-white text-black py-2.5 text-sm font-medium hover:bg-zinc-200 transition disabled:opacity-50"
+          >
+            {submitting ? "Saving..." : company ? "Update Company" : "Create Company"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
