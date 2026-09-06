@@ -9,6 +9,7 @@ import { DecisionProvider } from "./features/decision/decision.context";
 import { ExecutionProvider } from "./features/execution/execution.context";
 import { ReviewProvider } from "./features/review/review.context";
 import { AuditLogProvider } from "./features/auditLog/auditLog.context";
+import { AnalyticsProvider } from "./features/analytics/analytics.context";
 
 function App() {
   return (
@@ -21,7 +22,9 @@ function App() {
             <ReviewProvider>
               <ExecutionProvider>
                 <AuditLogProvider>
-                  <RouterProvider router={router} />
+                  <AnalyticsProvider>
+                    <RouterProvider router={router} />
+                  </AnalyticsProvider>
                 </AuditLogProvider>
               </ExecutionProvider>
             </ReviewProvider>

@@ -11,6 +11,7 @@ const decisionRouter = require("./routers/decision.router");
 const reviewRouter = require("./routers/review.router");
 const executionRouter = require("./routers/execution.router");
 const auditLogRouter = require("./routers/auditLog.router");
+const analyticsRouter = require("./routers/analytics.router");
 
 const app = express();
 
@@ -36,5 +37,5 @@ app.use("/api/decisions", decisionRouter);
 app.use("/api/reviews", reviewRouter);
 app.use("/api/executions", executionRouter);
 app.use("/api/audit-logs", auditLogRouter);
-
+app.use("/api/analytics", analyticsRouter);
 module.exports = app;

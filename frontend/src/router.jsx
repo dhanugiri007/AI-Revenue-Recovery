@@ -8,6 +8,7 @@ import CustomerList from "./features/customer/pages/CustomerList";
 import CustomerForm from "./features/customer/pages/CustomerForm";
 import EventList from "./features/paymentEvent/pages/EventList";
 import ReviewQueue from "./features/review/pages/ReviewQueue";
+import Dashboard from "./features/analytics/pages/Dashboard";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -17,7 +18,7 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <div className="text-3xl font-bold text-center mt-10">Dashboard (Protected)</div>
+        <Dashboard />
       </ProtectedRoute>
     ),
   },
