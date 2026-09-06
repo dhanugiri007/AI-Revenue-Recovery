@@ -4,6 +4,7 @@ import { useCustomer } from "../../customer/hooks/useCustomer";
 import { useCompany } from "../../company/hooks/useCompany";
 import { useDecision } from "../../decision/hooks/useDecision";
 import DecisionCard from "../../decision/components/DecisionCard";
+import AuditTrail from "../../auditLog/components/AuditTrail";
 
 const failureReasons = [
   "insufficient_funds",
@@ -206,6 +207,7 @@ const EventList = () => {
                         : "Generate AI Decision"}
                     </button>
                   )}
+                  <AuditTrail eventId={event._id} />
                 </li>
               );
             })}
