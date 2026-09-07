@@ -43,14 +43,18 @@ const embedPolicy = async (policy, companyId) => {
 
 // Retrieves top-k relevant policy chunks for a given query
 const retrievePolicyContext = async (companyId, query, k = 4) => {
-  const vectorStore = await getVectorStore(companyId);
-  const results = await vectorStore.similaritySearch(query, k);
-
-  return results.map((doc) => ({
-    content: doc.pageContent,
-    policyId: doc.metadata.policyId,
-    originalName: doc.metadata.originalName,
-  }));
+  try {
+    const vectorStore = await getVectorStore(companyId);
+    const results = await vectorStore.similaritySearch(query, k);
+    return results.map((doc) => ({
+      content: doc.pageContent,
+      policyId: doc.metadata.policyId,
+      originalName: doc.metadata.originalName,
+    }));
+  } catch (error) {
+    console.error("FULL retrieval error:", error);
+    console.error("Error cause:", error.cause);
+    throw error;
+  }
 };
-
 module.exports = { embedPolicy, retrievePolicyContext };
